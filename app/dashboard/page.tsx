@@ -11,6 +11,7 @@ import ReactFlow, {
   NodeChange,
   MiniMap,
   Controls,
+  Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
