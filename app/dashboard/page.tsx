@@ -20,6 +20,8 @@ import TextUpdaterNode from "./TextUpdater";
 import "./text-updater-node.css";
 import { Button } from "@/components/ui/button";
 
+import DownloadButton from "@/components/export";
+
 const rfStyle = {
   backgroundColor: "white",
 };
@@ -154,6 +156,7 @@ function Flow() {
       >
         <MiniMap style={minimapStyle} />
         <Controls position="top-left" />
+        <DownloadButton/>
       </ReactFlow>
     </div>
   );
