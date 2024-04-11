@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@langchain/google-genai": "^0.0.10",
+    "@langchain/openai": "^0.0.27",
     "@next/font": "^14.1.4",
+    "@radix-ui/react-hover-card": "^1.0.7",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",

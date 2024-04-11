@@ -33,21 +33,7 @@ const initialNodes = [
     id: "node-1",
     type: "textUpdater",
     position: { x: 0, y: 0 },
-    data: { value: 123 },
-  },
-  {
-    id: "node-2",
-    type: "output",
-    targetPosition: "top",
-    position: { x: 0, y: 200 },
-    data: { label: "node 2" },
-  },
-  {
-    id: "node-3",
-    type: "output",
-    targetPosition: "top",
-    position: { x: 200, y: 200 },
-    data: { label: "node 3" },
+    data: { value: "" },
   },
 ];
 
@@ -61,42 +47,112 @@ const nodeTypes = { textUpdater: TextUpdaterNode };
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [lastInteractedNodeId, setLastInteractedNodeId] = useState("");
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
       // @ts-ignore
       setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
+    []
   );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) =>
       // @ts-ignore
       setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
+    []
   );
   const onConnect = useCallback(
     (connection: Edge | Connection) =>
       // @ts-ignore
       setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
+    []
   );
+
+  // Function to add a new node
+  const addNewNode = () => {
+    const newNode = {
+      id: `node-${nodes.length + 1}`,
+      type: "textUpdater",
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      data: { value: `New node ${nodes.length + 1}` },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  };
+
+  // Function to remove the last node
+  const removeLastNode = () => {
+    if (nodes.length > 0) {
+      setNodes((nds) => nds.slice(0, -1));
+    }
+  };
+
+  const handleNodeSubmit = async (nodeId: string, inputValue: string) => {
+    // Fetch and parse the response
+    setLastInteractedNodeId(nodeId);
+
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: inputValue }),
+    });
+    const parsedResponse = await response.json();
+    const generatedNodes = parsedResponse.nodes;
+
+    // Reference node's position
+    const referenceNode = nodes.find((node) => node.id === nodeId);
+    if (!referenceNode) return; // Exit if reference node is not found
+
+    // Constants for positioning
+    const horizontalOffset = 350;
+    const verticalSpacing = 250;
+
+    let startPositionY =
+      referenceNode.position.y -
+      ((generatedNodes.length - 1) / 2) * verticalSpacing;
+
+    const newNodes = generatedNodes.map((node: any, index: number) => ({
+      id: `node-${Date.now()}-${index}`,
+      type: "textUpdater",
+      position: {
+        x: referenceNode.position.x + horizontalOffset,
+        y: startPositionY + index * verticalSpacing,
+      },
+      data: { value: node.text },
+    }));
+
+    const newEdges = newNodes.map((node: any, index: number) => ({
+      id: `edge-${Date.now()}-${index}`,
+      source: referenceNode.id,
+      target: node.id,
+    }));
+
+    setNodes((nds) => [...nds, ...newNodes]);
+    setEdges((eds) => [...eds, ...newEdges]);
+  };
 
   return (
     <div className="h-full w-full">
-      <Button>shadcn button!</Button>
+      <Button onClick={addNewNode}>Add Node</Button>
+      <Button onClick={removeLastNode}>Remove Last Node</Button>
       <ReactFlow
-        // @ts-ignore
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={nodeTypes}
+        nodeTypes={{
+          ...nodeTypes,
+          textUpdater: (props) => (
+            <TextUpdaterNode {...props} onSubmit={handleNodeSubmit} />
+          ),
+        }}
         style={rfStyle}
         fitView
         className="h-full w-full"
       >
-        <MiniMap style={minimapStyle} zoomable pannable />
+        <MiniMap style={minimapStyle} />
         <Controls position="top-left" />
       </ReactFlow>
     </div>

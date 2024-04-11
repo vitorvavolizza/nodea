@@ -1,60 +1,88 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Handle, Position } from "reactflow";
-
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Button } from "@/components/ui/button";
+function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
+  const [value, setValue] = useState(data.value || "");
 
-const handleStyle = { left: 10 };
-
-function TextUpdaterNode({ data, isConnectable }: any) {
   const onChange = useCallback((evt: any) => {
-    console.log(evt.target.value);
+    setValue(evt.target.value);
   }, []);
 
+  const handleSubmit = useCallback(
+    async (evt: any) => {
+      evt.preventDefault();
+      onSubmit(id, value);
+    },
+    [onSubmit, value, id]
+  );
+
+  const handleKeyDown = useCallback(
+    (evt: any) => {
+      if (evt.key === "Enter" && !evt.shiftKey) {
+        evt.preventDefault();
+        handleSubmit(evt);
+      }
+    },
+    [handleSubmit]
+  );
+
   return (
-    <Popover>
-    <PopoverTrigger>
-      <div className="text-updater-node">
+    <HoverCard>
+      <div className=" bg-white shadow-lg rounded-lg p-4 w-[300px]">
         <Handle
           type="target"
-          position={Position.Top}
+          position={Position.Left}
           isConnectable={isConnectable}
         />
-        <div>
-          <label htmlFor="text">Enter the initial idea...</label>
-          <input
-            id="text"
-            name="text"
-            onChange={onChange}
-            className="nodrag"
-            placeholder="Type something..."
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            {id === "node-1" ? (
+              <label
+                htmlFor="text"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Enter the initial idea
+              </label>
+            ) : null}
+            <textarea
+              id="text"
+              name="text"
+              value={value}
+              onChange={onChange}
+              onKeyDown={handleKeyDown}
+              className="nodrag mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs"
+              placeholder="Type something..."
+              rows={6}
+            />
+            <HoverCardTrigger className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              +
+            </HoverCardTrigger>
+          </div>
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="a"
+            isConnectable={isConnectable}
           />
-        </div>
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="a"
-          style={handleStyle}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="b"
-          isConnectable={isConnectable}
-        />
+        </form>
+        <HoverCardContent>
+          <Button variant="ghost" className="text-gray-600 font-light">
+            Add connected node
+          </Button>
+          <Button variant="ghost" className="text-gray-600 font-light">
+            Generate ideas
+          </Button>
+          <Button variant="ghost" className="text-gray-600 font-light">
+            Delete node
+          </Button>
+        </HoverCardContent>
       </div>
-    </PopoverTrigger>
-    <PopoverContent>
-      <Button variant="ghost">Add connected node</Button>
-      <Button variant="ghost">Generate ideas</Button>
-      <Button variant="ghost">Delete node</Button>
-      </PopoverContent>
-    </Popover>
+    </HoverCard>
   );
 }
 
