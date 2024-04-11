@@ -95,7 +95,7 @@ function Flow() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: inputValue }),
+      body: JSON.stringify({ idea: inputValue }),
     });
     const parsedResponse = await response.json();
     const generatedNodes = parsedResponse.nodes;
