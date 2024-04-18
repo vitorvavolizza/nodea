@@ -22,6 +22,10 @@ import { Button } from "@/components/ui/button";
 
 import DownloadButton from "@/components/export";
 
+import { ReactFlowProvider } from "reactflow";
+
+import { useMemo } from "react";
+
 const rfStyle = {
   backgroundColor: "white",
 };
@@ -44,7 +48,7 @@ const initialEdges = [
   { id: "edge-2", source: "node-1", target: "node-3", sourceHandle: "b" },
 ];
 
-const nodeTypes = { textUpdater: TextUpdaterNode };
+// const nodeTypes = { textUpdater: TextUpdaterNode };
 
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -134,7 +138,12 @@ function Flow() {
     setEdges((eds) => [...eds, ...newEdges]);
   };
 
+  const nodeTypes = useMemo(() => ({
+    textUpdater: (props) => <TextUpdaterNode {...props} onSubmit={handleNodeSubmit} />,
+  }), []);
+
   return (
+    <ReactFlowProvider>
     <div className="h-full w-full">
       <Button onClick={addNewNode}>Add Node</Button>
       <Button onClick={removeLastNode}>Remove Last Node</Button>
@@ -144,12 +153,7 @@ function Flow() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={{
-          ...nodeTypes,
-          textUpdater: (props) => (
-            <TextUpdaterNode {...props} onSubmit={handleNodeSubmit} />
-          ),
-        }}
+        nodeTypes={nodeTypes}
         style={rfStyle}
         fitView
         className="h-full w-full"
@@ -159,6 +163,7 @@ function Flow() {
         <DownloadButton/>
       </ReactFlow>
     </div>
+    </ReactFlowProvider>
   );
 }
 
