@@ -40,7 +40,6 @@ function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
 
 
   return (
-    <ReactFlowProvider>
       <HoverCard>
         <div className=" bg-white shadow-lg rounded-lg p-4 w-[300px]">
           <Handle
@@ -48,6 +47,7 @@ function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
             position={Position.Left}
             isConnectable={isConnectable}
           />
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               {id === "node-1" ? (
@@ -68,12 +68,13 @@ function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
                 placeholder="Type something..."
                 rows={6}
               />
-              <HoverCardTrigger className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                +
-              </HoverCardTrigger>
 
-              <Button className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={deleteNode} >
-                -
+              <Button type="button" className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={deleteNode} >
+                Delete
+              </Button>
+
+              <Button type="submit" className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Generate
               </Button>
 
               
@@ -100,7 +101,7 @@ function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
           </HoverCardContent>
         </div>
       </HoverCard>
-    </ReactFlowProvider>
+    
   );
 }
 

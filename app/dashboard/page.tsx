@@ -25,6 +25,9 @@ import DownloadButton from "@/components/export";
 import { ReactFlowProvider } from "reactflow";
 
 import { useMemo } from "react";
+import React from 'react';
+
+import { useEffect } from "react";
 
 const rfStyle = {
   backgroundColor: "white",
@@ -48,7 +51,8 @@ const initialEdges = [
   { id: "edge-2", source: "node-1", target: "node-3", sourceHandle: "b" },
 ];
 
-// const nodeTypes = { textUpdater: TextUpdaterNode };
+const nodeTypes = { textUpdater: TextUpdaterNode };
+const TextUpdaterNodeMemo = React.memo(TextUpdaterNode);
 
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -92,9 +96,14 @@ function Flow() {
     }
   };
 
+  var listOfNodes = nodes;
+
   const handleNodeSubmit = async (nodeId: string, inputValue: string) => {
-    // Fetch and parse the response
-    setLastInteractedNodeId(nodeId);
+    console.log("Innitial nodes: ", nodes);
+    console.log(inputValue, '\n',nodeId );
+
+    // Fetch and parse the response    
+    console.log("laster interacted node id: ",lastInteractedNodeId)
 
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -103,12 +112,18 @@ function Flow() {
       },
       body: JSON.stringify({ idea: inputValue }),
     });
+
+    console.log("after response ", response);
+
+
     const parsedResponse = await response.json();
     const generatedNodes = parsedResponse.nodes;
 
     // Reference node's position
-    const referenceNode = nodes.find((node) => node.id === nodeId);
-    if (!referenceNode) return; // Exit if reference node is not found
+    // const referenceNode = nodes.find((node) => node.id === nodeId);
+    const referenceNode = listOfNodes.find((node) => node.id === nodeId);
+
+    if (!referenceNode) return console.log('stupid'); // Exit if reference node is not found
 
     // Constants for positioning
     const horizontalOffset = 350;
@@ -133,13 +148,16 @@ function Flow() {
       source: referenceNode.id,
       target: node.id,
     }));
-
+    
     setNodes((nds) => [...nds, ...newNodes]);
     setEdges((eds) => [...eds, ...newEdges]);
-  };
+    console.log("List of nodes", nodes); 
+    listOfNodes = [...listOfNodes, ...newNodes];
+    console.log(listOfNodes)
+  }
 
   const nodeTypes = useMemo(() => ({
-    textUpdater: (props) => <TextUpdaterNode {...props} onSubmit={handleNodeSubmit} />,
+    textUpdater: (props) => <TextUpdaterNodeMemo key={props.id} {...props} onSubmit={handleNodeSubmit} />,
   }), []);
 
   return (
@@ -158,6 +176,7 @@ function Flow() {
         fitView
         className="h-full w-full"
       >
+        
         <MiniMap style={minimapStyle} />
         <Controls position="top-left" />
         <DownloadButton/>
