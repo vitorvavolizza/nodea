@@ -69,11 +69,11 @@ function TextUpdaterNode({ data, id, isConnectable, onSubmit }: any) {
                 rows={6}
               />
 
-              <Button type="button" className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={deleteNode} >
+              <Button type="button" className="mt-2 inline-flex items-center px-4 py-2 border border-indigo-600 text-sm leading-4 font-medium rounded-xl shadow-sm text-indigo-600 bg-white hover:bg-indigo-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={deleteNode} >
                 Delete
               </Button>
 
-              <Button type="submit" className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Button type="submit" className="mt-2 ml-2 inline-flex items-center px-4 py-2 border border-indigo-600 text-sm leading-4 font-medium rounded-xl shadow-sm text-indigo-600 bg-white hover:bg-indigo-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Generate
               </Button>
 

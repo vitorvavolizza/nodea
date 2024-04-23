@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const chain = RunnableSequence.from([
     PromptTemplate.fromTemplate(
       `USER IDEA: {user_idea}
-      Given the user idea for the story, list a short continuation for it, with around 30 words.`
+      Given the user idea for a character, plot, or setting, expand on the idea, with a max of around 30 words.`
     ),
     model,
     parser,
