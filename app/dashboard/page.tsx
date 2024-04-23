@@ -27,7 +27,9 @@ import { ReactFlowProvider } from "reactflow";
 import { useMemo } from "react";
 import React from 'react';
 
-import { useEffect } from "react";
+import { useRef } from 'react';
+
+import { updateEdge } from 'reactflow';
 
 const rfStyle = {
   backgroundColor: "white",
@@ -58,6 +60,7 @@ function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [lastInteractedNodeId, setLastInteractedNodeId] = useState("");
+  const edgeUpdateSuccessful = useRef(true);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -160,6 +163,23 @@ function Flow() {
     textUpdater: (props) => <TextUpdaterNodeMemo key={props.id} {...props} onSubmit={handleNodeSubmit} />,
   }), []);
 
+  const onEdgeUpdateStart = useCallback(() => {
+    edgeUpdateSuccessful.current = false;
+  }, []);
+
+  const onEdgeUpdate = useCallback((oldEdge, newConnection) => {
+    edgeUpdateSuccessful.current = true;
+    setEdges((els) => updateEdge(oldEdge, newConnection, els));
+  }, []);
+
+  const onEdgeUpdateEnd = useCallback((_, edge) => {
+    if (!edgeUpdateSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+
+    edgeUpdateSuccessful.current = true;
+  }, []);
+
   return (
     <ReactFlowProvider>
     <div className="h-full w-full">
@@ -170,6 +190,9 @@ function Flow() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onEdgeUpdate={onEdgeUpdate}
+        onEdgeUpdateStart={onEdgeUpdateStart}
+        onEdgeUpdateEnd={onEdgeUpdateEnd}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         style={rfStyle}
