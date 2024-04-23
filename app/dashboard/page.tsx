@@ -22,6 +22,13 @@ import { Button } from "@/components/ui/button";
 
 import DownloadButton from "@/components/export";
 
+import { ReactFlowProvider } from "reactflow";
+
+import { useMemo } from "react";
+import React from 'react';
+
+import { useEffect } from "react";
+
 const rfStyle = {
   backgroundColor: "white",
 };
@@ -45,6 +52,7 @@ const initialEdges = [
 ];
 
 const nodeTypes = { textUpdater: TextUpdaterNode };
+const TextUpdaterNodeMemo = React.memo(TextUpdaterNode);
 
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
@@ -88,9 +96,14 @@ function Flow() {
     }
   };
 
+  var listOfNodes = nodes;
+
   const handleNodeSubmit = async (nodeId: string, inputValue: string) => {
-    // Fetch and parse the response
-    setLastInteractedNodeId(nodeId);
+    console.log("Innitial nodes: ", nodes);
+    console.log(inputValue, '\n',nodeId );
+
+    // Fetch and parse the response    
+    console.log("laster interacted node id: ",lastInteractedNodeId)
 
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -99,12 +112,18 @@ function Flow() {
       },
       body: JSON.stringify({ idea: inputValue }),
     });
+
+    console.log("after response ", response);
+
+
     const parsedResponse = await response.json();
     const generatedNodes = parsedResponse.nodes;
 
     // Reference node's position
-    const referenceNode = nodes.find((node) => node.id === nodeId);
-    if (!referenceNode) return; // Exit if reference node is not found
+    // const referenceNode = nodes.find((node) => node.id === nodeId);
+    const referenceNode = listOfNodes.find((node) => node.id === nodeId);
+
+    if (!referenceNode) return console.log('stupid'); // Exit if reference node is not found
 
     // Constants for positioning
     const horizontalOffset = 350;
@@ -129,12 +148,20 @@ function Flow() {
       source: referenceNode.id,
       target: node.id,
     }));
-
+    
     setNodes((nds) => [...nds, ...newNodes]);
     setEdges((eds) => [...eds, ...newEdges]);
-  };
+    console.log("List of nodes", nodes); 
+    listOfNodes = [...listOfNodes, ...newNodes];
+    console.log(listOfNodes)
+  }
+
+  const nodeTypes = useMemo(() => ({
+    textUpdater: (props) => <TextUpdaterNodeMemo key={props.id} {...props} onSubmit={handleNodeSubmit} />,
+  }), []);
 
   return (
+    <ReactFlowProvider>
     <div className="h-full w-full">
       <Button onClick={addNewNode}>Add Node</Button>
       <Button onClick={removeLastNode}>Remove Last Node</Button>
@@ -144,21 +171,18 @@ function Flow() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodeTypes={{
-          ...nodeTypes,
-          textUpdater: (props) => (
-            <TextUpdaterNode {...props} onSubmit={handleNodeSubmit} />
-          ),
-        }}
+        nodeTypes={nodeTypes}
         style={rfStyle}
         fitView
         className="h-full w-full"
       >
+        
         <MiniMap style={minimapStyle} />
         <Controls position="top-left" />
         <DownloadButton/>
       </ReactFlow>
     </div>
+    </ReactFlowProvider>
   );
 }
 
