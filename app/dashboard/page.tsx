@@ -28,7 +28,7 @@ import { ReactFlowProvider } from "reactflow";
 import { useMemo } from "react";
 import React from 'react';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 import { updateEdge } from 'reactflow';
 
@@ -57,12 +57,15 @@ const initialEdges = [
 const nodeTypes = { textUpdater: TextUpdaterNode };
 const TextUpdaterNodeMemo = React.memo(TextUpdaterNode);
 
+var listOfNodes = [];
+
 function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [isLoading, setIsLoading] = useState(false);
   const [lastInteractedNodeId, setLastInteractedNodeId] = useState("");
   const edgeUpdateSuccessful = useRef(true);
+  listOfNodes = nodes;
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -93,6 +96,7 @@ function Flow() {
     };
     setNodes((nds) => nds.concat(newNode));
     listOfNodes = [...listOfNodes, newNode];
+    console.log("Adding node: ", listOfNodes);
   };
 
   // Function to remove the last node
@@ -102,10 +106,10 @@ function Flow() {
     }
   };
 
-  var listOfNodes = nodes;
+  
 
   const handleNodeSubmit = async (nodeId: string, inputValue: string) => {
-    setIsLoading(true)
+    setIsLoading(true);
     console.log("Innitial nodes: ", nodes);
     console.log(inputValue, '\n',nodeId );
 
@@ -128,6 +132,9 @@ function Flow() {
 
     // Reference node's position
     // const referenceNode = nodes.find((node) => node.id === nodeId);
+    console.log("check")
+    console.log(listOfNodes)
+    console.log(nodeId)
     const referenceNode = listOfNodes.find((node) => node.id === nodeId);
 
     if (!referenceNode) return console.log('stupid'); // Exit if reference node is not found
