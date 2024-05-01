@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, do these steps to install the necessary dependencies and packages:
 1. clone repo
-2. create a file in the root called .env.local, and in this file add OPENAI_API_KEY="...." with the key with the exact syntax. [We have attached this .env.local file to Canvas, so you should get the api key from there]
+2. create a file in the root called .env.local, and in this file add OPENAI_API_KEY="...." with the key with the exact syntax. [We have attached this .env.local file to our canvas submission, so you should be able to get the api key from there]
 3. run npm install
 
 Then, run the development server with "npm run dev":
